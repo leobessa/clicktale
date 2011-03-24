@@ -7,7 +7,7 @@
       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ct, s);
   })();
 
-  if(typeof ClickTale == 'function') {
+  function ClickTale_WhenAvailableCallback() {
     <%- if request.ssl? -%>
     var ClickTaleSSL = 1;
     <%- end -%>
@@ -21,5 +21,25 @@
     ClickTale(<%= project_id %>, <%= ratio %>);
     <% end -%>
   }
+
+  window.CallClickTaleWhenAvailable = function() {
+    window.CallClickTaleWhenAvailable = undefined;
+
+    var loopCount = 0, loopMax = 200;
+
+    function CheckForClickTale() {
+      if(typeof ClickTale == "function") {
+        if(typeof ClickTale_WhenAvailableCallback != "function") return;
+        ClickTale_WhenAvailableCallback();
+      } else if(loopCount < loopMax) {
+        loopCount++;
+        setTimeout(arguments.callee, 100);
+      }
+    }
+
+    CheckForClickTale();
+  };
+
+  window.CallClickTaleWhenAvailable();
 
 </script>
